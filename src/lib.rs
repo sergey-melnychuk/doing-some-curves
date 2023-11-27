@@ -78,7 +78,7 @@ pub fn sig(sk: &[u8], msg: &[u8]) -> (Vec<u8>, Vec<u8>) {
 
     let g = Affine::new(G_GENERATOR_X, G_GENERATOR_Y);
     let r = g * k;
-    let r: Projective = from_bytes(&into_bytes(&r));
+    let r = Affine::from(r);
     let rx = F::from(r.x.into_bigint());
 
     let s = ki * (h + rx * sk);
@@ -111,10 +111,9 @@ pub fn ver(pk: &[u8], msg: &[u8], sig: (&[u8], &[u8])) -> bool {
 
     let g = Affine::new(G_GENERATOR_X, G_GENERATOR_Y);
     let r = g * h * si + pk * rx * si;
-    let r: Projective = from_bytes(&into_bytes(&r));
-    let x1 = F::from(r.x.into_bigint());
+    let r = Affine::from(r);
 
-    into_bytes(&rx) == into_bytes(&x1)
+    rx == F::from(r.x.into_bigint())
 }
 
 #[cfg(test)]
