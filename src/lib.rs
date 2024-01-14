@@ -36,6 +36,7 @@ mod utils {
     }
 }
 
+use ark_serialize::CanonicalSerialize;
 use utils::{from_bytes, hash, into_bytes};
 
 pub fn rand() -> Vec<u8> {
@@ -60,19 +61,14 @@ pub fn get_pk(sk: &[u8]) -> Vec<u8> {
     into_bytes(&pk)
 }
 
-pub fn get_pk_xy(sk: &[u8]) -> (Vec<u8>, Vec<u8>) {
-    // Derive Public Key from a Secret Key:
-    //
-    // SK - secret key (scalar)
-    // G - generator point
-    //
-    // PK = G * SK
-
+pub fn get_pk_xy(sk: &[u8]) -> Vec<u8> {
     let g = Affine::new(G_GENERATOR_X, G_GENERATOR_Y);
     let sk = F::from_be_bytes_mod_order(sk);
     let pk = g * sk;
 
-    (into_bytes(&pk.x), into_bytes(&pk.y))
+    let mut buf = Vec::with_capacity(64);
+    pk.serialize_uncompressed(&mut buf).unwrap();
+    buf
 }
 
 pub fn sig(sk: &[u8], msg: &[u8]) -> (Vec<u8>, Vec<u8>) {
