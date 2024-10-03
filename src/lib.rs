@@ -169,8 +169,8 @@ mod tests {
         let b = F::rand(&mut rng);
         let gb = g * b;
 
-        let one = ga + gb;
-        let two = gb + ga;
+        let one = ga * b;
+        let two = gb * a;
 
         // shared secrets must match
         assert_eq!(one, two);
